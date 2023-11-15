@@ -3,4 +3,4 @@ test.html
 
 #ignore my push and give permissions scripts
 permit.sh
-perimitPush.sh
+permitPush.sh
