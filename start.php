@@ -1,8 +1,8 @@
 <?php
 require_once('SECRETS.php');
-require_once('setup.php');
+require_once('initialize.php');
 
 createBattlefield($servername, $username, $password, $dbname);
-echo "<br/> Check Tables "
+echo "Check Tables \n"
 
 ?>
