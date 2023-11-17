@@ -3,7 +3,7 @@ require_once('initialize.php');
 require_once('dbCalls.php');
 require_once('SECRETS.php');
 
-authenticateUser($servername, $username, $password, $dbanme);
+authenticateUser($servername, $username, $password, $dbname);
 
 function authenticateUser($servername, $username, $password, $dbname) {
 	$allowedUsers = array('Player1', 'Player2');
@@ -12,12 +12,14 @@ function authenticateUser($servername, $username, $password, $dbname) {
 		echo "Please specify user";
 		exit;
 	}
-	$user = $_GET['username'];	
+	$user = 'Player1'; #$_GET['username'];
+	$info = [$servername, $username, $password, $dbname];
+	$conn = dbConnect($info);
 	echo "Hello: " . $user . "\n";
 	if (isset($_GET['ship'])) {
 		if (isset($_GET['orientation'])) {
 			if (isset($_GET['start'])) {
-				setShipStatus($conn, $_GET['ship'], $_GET['orientation'], $_GET['start']);
+				setShipStatus($conn, $user, $_GET['ship'], $_GET['orientation'], $_GET['start']);
 			} else {
 				echo "Missing Ship Start square. Didn't set ship\n";
 			}
