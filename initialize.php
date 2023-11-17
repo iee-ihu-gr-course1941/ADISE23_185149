@@ -101,4 +101,8 @@ function insertInit($conn, $insert) {
 		echo $ex;	
 	}
 }
+
+function getConnection($servername, $username, $password, $dbname) {
+	return new mysqli($servername, $username, $password, $dbname);
+}
 ?>
