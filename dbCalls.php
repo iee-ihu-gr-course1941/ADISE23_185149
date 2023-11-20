@@ -44,10 +44,13 @@ function setShipStatus($conn, $user, $ship, $orientation, $shipPositionStart) {
 	#Orientation Check
 	if ($orientation == 'horizontal') {
 
+		if ($startNumber > 6) {
+			echo "Ship Position is invalid. Didn't set ship";
+			exit;
+		}
 		#Horizontal Name Check
 		if ($ship == 'Carrier') {
 
-			#Check if ship fits
 			$query = '';
 			switch ($startLetter) {
 				case 'd':
@@ -153,7 +156,127 @@ function setShipStatus($conn, $user, $ship, $orientation, $shipPositionStart) {
 			$conn->query($sql);
 
 		}
+	} else if ($orientation == 'vertical') {
+
+		if($ship == 'Carrier') {	
+
+			if ($startNumber > 3) {
+				echo "Invalid Ship Position. Didn't set ship.";
+				exit;
+			}
+
+			switch ($startLetter) {
+			case 'a':
+				$conn->query($sql . "set a = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+				break;
+			case 'b':
+				$conn->query($sql . "set b = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+				break;
+			case 'c':
+				$conn->query($sql . "set c = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+				break;
+			case 'd':
+				$conn->query($sql . "set d = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+				break;
+			case 'e':
+				$conn->query($sql . "set e = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+				break;
+			case 'f':
+				$conn->query($sql . "set f = 'C' where row = " . $startNumber . "and row = " . ($startNumber + 1) .  "and row = " . ($startNumber + 2) . "and row = " . ($startNumber + 3) . ";");
+			}
+
+		}
+		else if ($ship == 'Battleship') {
+
+			if ($startNumber > 4) {
+				echo "Invalid Ship Position. Didn't set ship.";
+				exit;
+			}
+
+
+			switch ($startLetter) {
+			case 'a':
+				$conn->query($sql . "set a = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'b':
+				$conn->query($sql . "set b = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'c':
+				$conn->query($sql . "set c = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) .  ";");
+				break;
+			case 'd':
+				$conn->query($sql . "set d = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'e':
+				$conn->query($sql . "set e = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'f':
+				$conn->query($sql . "set f = 'B' where row = " . $startNumber . "and row = " . ($startNumber + 1) .  "and row = " . ($startNumber + 2) . ";");
+			}
+
+		}
+		else if ($ship == 'Submarine') {
+
+			if ($startNumber > 4) {
+				echo "Invalid Ship Position. Didn't set ship.";
+				exit;
+			}
+
+
+			switch ($startLetter) {
+			case 'a':
+				$conn->query($sql . "set a = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'b':
+				$conn->query($sql . "set b = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'c':
+				$conn->query($sql . "set c = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) .  ";");
+				break;
+			case 'd':
+				$conn->query($sql . "set d = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'e':
+				$conn->query($sql . "set e = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1)  . "and row = " . ($startNumber + 2) . ";");
+				break;
+			case 'f':
+				$conn->query($sql . "set f = 'S' where row = " . $startNumber . "and row = " . ($startNumber + 1) .  "and row = " . ($startNumber + 2) . ";");
+			}
+
+		}
+		else if ($ship == 'Boat') {
+
+			if ($startNumber == 6) {
+				echo "Invalid Ship Position. Didn't set ship.";
+				exit;
+			}
+
+			switch ($startLetter) {
+			case 'a':
+				$conn->query($sql . "set a = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+				break;
+			case 'b':
+				$conn->query($sql . "set b = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+				break;
+			case 'c':
+				$conn->query($sql . "set c = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+				break;
+			case 'd':
+				$conn->query($sql . "set d = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+				break;
+			case 'e':
+				$conn->query($sql . "set e = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+				break;
+			case 'f':
+				$conn->query($sql . "set f = 'b' where row = " . $startNumber . "and row = " . ($startNumber + 1) . ";");
+			}
+
+		}
 	}
+}
+
+function canPlaceShip($conn, $user, $startumber, $startLetter, $orientation, $shipType) {
+
 }
 
 ?>
