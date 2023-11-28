@@ -5,7 +5,7 @@ require_once('SECRETS.php');
 require_once('authenticate.php');
 
 $info = [$servername, $username,  $password, $dbname];
-$user = authenticate(['Player1','Player2']);
+$user = authenticate(get_player_usernames());
 $method = $_SERVER['REQUEST_METHOD'];
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
 
