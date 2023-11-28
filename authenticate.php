@@ -13,6 +13,7 @@ function authenticate($usernames) {
 		http_response_code(400);
 		exit;
 	}
+	return $_SERVER['PHP_AUTH_USER'];
 }
 
 ?>

@@ -1,47 +1,64 @@
 <?php
 require_once('initialize.php');
-require_once('dbCalls.php');
+require_once('db_calls.php');
 require_once('SECRETS.php');
+require_once('authenticate.php');
 
 $info = [$servername, $username,  $password, $dbname];
+$user = authenticate(['Player1','Player2']);
+$method = $_SERVER['REQUEST_METHOD'];
+$request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
 
-$user = authenticateUser($info);
-showCurrentGameStatus($info, $user);
-
-
-function authenticateUser($info) {
-	$allowedUsers = array('Player1', 'Player2');
-	#Checking if user is in array of allowed users
-	if (!isset($_GET['username']) || !in_array($_GET['username'], $allowedUsers)) {
-		echo "Please specify user\n";
-		exit;
+switch ($r = array_shift($request)) {
+case 'boards':
+	if ($method == 'GET') {
+		get_boards($user);
+	} else if ($method == 'POST') {
+		reset_boards($user);
+		get_boards($user);
 	}
-	$user = $_GET['username'];
-	echo "Hello: " . $user . "\n";
-	return $user;
-}
-
-function showCurrentGameStatus($info, $user) {
-	$conn = dbConnect($info);
-	if (isset($_GET['ship'])) {
-		if (isset($_GET['orientation'])) {
-			if (isset($_GET['start'])) {
-				setShipStatus($conn, $user, $_GET['ship'], $_GET['orientation'], $_GET['start']);
+	break;
+case 'board':
+	if ($request[1] == 'my_ships') {
+		if ($request == 'GET') {
+			if ($request.count == 2) {
+				get_ships($user);
 			} else {
-				echo "Missing Ship Start square. Didn't set ship\n";
+				get_ship($user, $request[2]);
 			}
-		} else {
-			echo "Missing Ship Orientation. Didn't set ship\n"; 
+		} else if ($request == 'PUT') {
+			set_ship($user, $request[2], $request[3], $request[4], $request[5]);
 		}
-	} else {
-		echo "Select ship to set\n";
+	} else if ($request[1] == 'enemy') {
+		if ($request == 'GET') {
+			if ($request.count == 2) {
+				get_enemy($user);
+			} else {
+				get_enemy_cell($user, $request[2], $request[3]);
+			}
+		} else if ($request == 'PUT') {
+			attack_cell($user, $request[2], $request[3]);
+		}
 	}
-	$playerCarrierStatus = getShipStatus($info, 'Carrier');
-	$playerBattleshipStatus = getShipStatus($info, 'Battleship');
-	$playerSubmarineStatus = getShipStatus($info, 'Submarine');
-	$playerBoatStatus = getShipStatus($info, 'Boat');
-	echo "-----YOUR SHIPS-----\nShip           | Location |\nCarrier (C)    | ". $playerCarrierStatus ."  |\nBattleship (B) | ". $playerBattleshipStatus ."  |\nSubmarine (S)  | ". $playerSubmarineStatus ."  |\nBoat (b)       | ". $playerBoatStatus ."  |\n\nYour Board:\n" . getShipBoard($info, $user);
-	$conn->close();		
+	break;
+case 'status':
+	if ($method == 'GET') {
+		get_status();
+	}
+	break;
+case 'players':
+	if ($method == 'GET') {
+		if ($request.count == 1) {
+			get_players();
+		} else {
+			get_player($request[1])
+		}
+	} else if ($method == 'PUT') {
+		put_player($request[0], $request[1]);
+	}
+	break;
+default:
+	header("HTTP/1.1 404 Not Found");
+	exit;
 }
-
 ?>
