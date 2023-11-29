@@ -34,6 +34,9 @@ Battleship board game
 - ```/players/{p}```	GET		- Returns given player’s info
 - ```/players/``` GET		- Returns all players data
 
+
+### Variable values:
+
 board_name values:
 - ```my_ships```
 - ```enemy```
