@@ -1,12 +1,78 @@
 <?php
 
-
-
-function dbConnect($info) {	
+function db_connect($info) {	
 	return new mysqli($info[0], $info[1], $info[2], $info[3]);
 }
 
-function canPlaceShip($conn, $user, $startNumber, $startLetter, $orientation, $ship) {
+# /boards/
+function get_boards($conn, $user) {
+
+}
+
+function reset_boards($conn, $user) {
+
+}
+
+function get_ships($conn, $user) {
+
+}
+
+function get_ship($conn, $user, $ship_name) {
+
+}
+
+function set_ship($conn, $user, $x1, $y1, $x2, $y2) {
+
+}
+
+function get_enemy($conn, $user) {
+
+}
+
+function get_enemy_cell($conn, $user, $x, $y) {
+
+}
+
+function attack_enemy_cell($conn, $user, $x, $y) {
+
+}
+
+function get_status($conn) {
+	$result = $conn->query("select * from status");
+	$data = array();
+	if ($result->num_rows > 0) {
+		$count = 0;
+		$data_json = '{"Response":{"';
+		while($data = $result->fetch_assoc()) {
+			$data_json = $data_json . $count . '":{"Game State":"' . $data['gamestate'] . '", "Next Action":"' . $data['next_action'] . '"},';
+		}
+		$response = substr($data_json, 0, -1);
+		$response = $response . "}}";
+		
+		header("Content-Type: application/json");
+		echo json_encode(json_decode($response)) . "\n";
+		$conn->close();
+		exit;
+	} else {
+		header("HTTP/1.1 500 Internal Server Error");
+		$conn->close();
+		exit;
+	}
+}
+
+function get_players($conn) {
+
+}
+
+function get_player($conn, $player) {
+
+}
+
+function get_player_usernames() {
+	return ['Player1', 'Player2'];
+}
+
+function can_place_ship($conn, $user, $startNumber, $startLetter, $orientation, $ship) {
 	$result = $conn->query("select * from player1ships;");
 	if ($user == 'Player2') {
 		$result = $conn->query("select * from player2ships;");

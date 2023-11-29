@@ -1,6 +1,6 @@
 <?php
 
-function createBattlefield($servername, $username, $password, $dbname) {
+function create_battlefield($servername, $username, $password, $dbname) {
 	$insert = " (row,a,b,c,d,e,f) values(";
 
 	$createAttack = " (
@@ -32,7 +32,7 @@ function createBattlefield($servername, $username, $password, $dbname) {
 
 	drop($conn);
 	create($conn, $createAttack, $createShips);
-	insertInit($conn, $insert);
+	insert_init($conn, $insert);
 	
 	
 	#Close the connection to the server	
@@ -66,7 +66,7 @@ function create($conn, $createAttack, $createShips) {
 
 }
 
-function insertInit($conn, $insert) {
+function insert_init($conn, $insert) {
 	#Insert initial values
 	try {
 		$conn->query("INSERT INTO player1attack" . $insert . "1,'U','U','U','U','U','U')");	
