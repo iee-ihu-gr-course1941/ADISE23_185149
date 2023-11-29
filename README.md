@@ -30,3 +30,29 @@ Battleship board game
 
 - /players/{p}									                             GET		- Returns given player’s info
 - /players/										                               GET		- Returns all players data
+
+board_name values:
+- my_ships
+- enemy
+
+ship_name values:
+- battleship (3 spaces)
+- boat (2 spaces)
+- carrier (4 spaces)
+- submarine (3 spaces)
+
+y values:
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+
+x values:
+- a
+- b
+- c
+- d
+- e
+- f
