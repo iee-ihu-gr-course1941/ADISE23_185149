@@ -19,11 +19,9 @@ Battleship board game
 
 - ```/board/{board_name}``` GET 	- Returns your selected board
 
-- ```/board/my_ships/``` GET 	- Returns board
 - ```/board/my_ships/{ship_name}``` GET 	- Returns position of ship if set
 - ```/board/my_ships/{ship_name}/{x1}/{y1}/{x2}/{y2}``` POST 	- sets ship on position x1y1 to x2y2 and returns boards
 
-- ```/board/enemy/``` GET 	- Returns enemy board
 - ```/board/enemy/{x}/{y}``` GET 	- Returns current cell status
 - ```/board/enemy/{x}/{y}``` POST 	- Attacks current cell, returns whole board
 
