@@ -27,6 +27,8 @@ Battleship board game
 
 - ```/status/``` GET 	- Returns game status
 
+
+### Future implementation:
 - ```/players/{p}```	GET		- Returns given player’s info
 - ```/players/``` GET		- Returns all players data
 
