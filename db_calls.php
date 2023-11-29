@@ -8,8 +8,10 @@ function db_connect($info) {
 function get_boards($conn, $user) {
     $my_ships = get_board($conn, $user, 'my_ships');
     $enemy = get_board($conn, $user, 'enemy');
-    echo $my_ships . "\n";
-    echo $enemy . "\n";
+
+    $json = substr($my_ships, 0, -2) . ',' . substr($enemy, 1);
+    header("Content-Type: application/json");
+    echo json_encode(json_decode($json)) . "\n";
 }
 
 function get_board($conn, $user, $board_name) {
@@ -33,15 +35,14 @@ function get_board($conn, $user, $board_name) {
     if ($board->num_rows > 0) {
         $json_begin = '{"' . $board_name .'":{';
         $json_end = '}';
-        $data_json = ''
-        while($data = $result->fetch_assoc()) {
+        $data_json = '';
+        while($data = $board->fetch_assoc()) {
             $data_json = $data_json . '"' . $data['row'] . '": {"a": "' . $data['a'] . '","b": "' . $data['b'] . '","c": "' . $data['c'] . '","d": "' . $data['d'] . '","e": "' . $data['e'] . '","f": "' . $data['f'] . '"},';
         }
         $response = substr($data_json, 0, -1);
-        $response = $response . "}}}";
+        $response = $response . "}";
         
-        $json = $json_begin . $data_json . $json_end;
-        
+        $json = $json_begin . $response . $json_end;
         return json_encode(json_decode($json)) . "\n";
     }
     return json_encode(json_decode($board_json));
