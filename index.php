@@ -22,7 +22,7 @@ case 'boards':
 	if ($method == 'GET') {
 		get_boards($conn, $user);
 	} else if ($method == 'POST') {
-		reset_boards($conn, $user);
+		reset_boards($conn);
 		get_boards($conn, $user);
 	}
 	break;
