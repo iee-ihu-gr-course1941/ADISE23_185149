@@ -6,14 +6,14 @@ require_once('authenticate.php');
 
 $info = [$servername, $username,  $password, $dbname];
 
-#$user = authenticate(get_player_usernames());
-$user = 'Player1';
+$user = authenticate(get_player_usernames());
+#$user = 'Player1';
 
 $method = $_SERVER['REQUEST_METHOD'];
-#$method = 'GET';
+#$method = 'POST';
 
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
-#$request = array('board', 'enemy');
+#$request = array('boards', 'enemy');
 
 $conn = db_connect($info);
 

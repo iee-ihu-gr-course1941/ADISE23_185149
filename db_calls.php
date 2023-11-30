@@ -17,12 +17,12 @@ function get_boards($conn, $user) {
 function get_board($conn, $user, $board_name) {
     if ($board_name == 'my_ships') {
         $board = $conn->query('select * from player1ships');
-        if ($user == 'Player1') {
+        if ($user == 'Player2') {
             $board = $conn->query('select * from player2ships');
         }
     } else if ($board_name == 'enemy'){
         $board = $conn->query('select * from player1attack');
-        if ($user == 'Player1') {
+        if ($user == 'Player2') {
             $board = $conn->query('select * from player2attack');
         }
     } else {
@@ -133,7 +133,8 @@ function reset_boards($conn) {
 	if ($conn -> multi_query($sql)) {
 		do {
 			if ($result = $conn -> store_result()) {
-				while ($row = $result -> fetch_row()) {}
+				while ($row = $result -> fetch_row()) {}		
+			}
 		} while ($conn -> next_result());
 	}
 
