@@ -130,7 +130,9 @@ function reset_boards($conn) {
             INSERT INTO player2ships(row, a, b, c, d, e, f) values (6,'U','U','U','U','U','U');
 
 	    UPDATE status SET gamestate = 'Ship Setup', next_action = 'Both';
-     	
+
+	    UPDATE player_ships SET ship_status = 'Not Set', start_position = NULL, end_position = NULL, first_space = NULL, second_space = NULL, third_space = NULL, fourth_space = NULL;
+
             COMMIT;";
             
     
