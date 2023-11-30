@@ -49,8 +49,87 @@ function get_board($conn, $user, $board_name) {
 }
 
 
-function reset_boards($conn, $user) {
+function reset_boards($conn) {
 
+    $sql = "
+            START TRANSACTION;
+
+            drop table if exists player1ships;
+            drop table if exists player2ships;
+            drop table if exists player1attack;
+            drop table if exists player2attack;
+            
+            create table player1ships(
+                row int,
+                a varchar(1),
+                b varchar(1),
+                c varchar(1),
+                d varchar(1),
+                e varchar(1),
+                f varchar(1)
+            );
+            
+            create table player2ships(
+                row int,
+                a varchar(1),
+                b varchar(1),
+                c varchar(1),
+                d varchar(1),
+                e varchar(1),
+                f varchar(1)
+            );
+            
+            create table player1attack(
+                row int,
+                a varchar(1),
+                b varchar(1),
+                c varchar(1),
+                d varchar(1),
+                e varchar(1),
+                f varchar(1)
+            );
+            
+            create table player2attack(
+                row int,
+                a varchar(1),
+                b varchar(1),
+                c varchar(1),
+                d varchar(1),
+                e varchar(1),
+                f varchar(1)
+            );
+            
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (1,'U','U','U','U','U','U');
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (2,'U','U','U','U','U','U');
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (3,'U','U','U','U','U','U');
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (4,'U','U','U','U','U','U');
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (5,'U','U','U','U','U','U');
+            INSERT INTO player1attack(row, a, b, c, d, e, f) values (6,'U','U','U','U','U','U');
+                        
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (1,'U','U','U','U','U','U');
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (2,'U','U','U','U','U','U');
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (3,'U','U','U','U','U','U');
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (4,'U','U','U','U','U','U');
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (5,'U','U','U','U','U','U');
+            INSERT INTO player2attack(row, a, b, c, d, e, f) values (6,'U','U','U','U','U','U');
+                        
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (1,'U','U','U','U','U','U');
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (2,'U','U','U','U','U','U');
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (3,'U','U','U','U','U','U');
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (4,'U','U','U','U','U','U');
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (5,'U','U','U','U','U','U');
+            INSERT INTO player1ships(row, a, b, c, d, e, f) values (6,'U','U','U','U','U','U');
+                        
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (1,'U','U','U','U','U','U');
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (2,'U','U','U','U','U','U');
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (3,'U','U','U','U','U','U');
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (4,'U','U','U','U','U','U');
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (5,'U','U','U','U','U','U');
+            INSERT INTO player2ships(row, a, b, c, d, e, f) values (6,'U','U','U','U','U','U');
+            
+            COMMIT;";
+            
+    $conn -> multi_query($sql);
 }
 
 function get_ships($conn, $user) {
