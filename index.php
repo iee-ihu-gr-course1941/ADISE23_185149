@@ -10,10 +10,10 @@ $user = authenticate(get_player_usernames());
 #$user = 'Player1';
 
 $method = $_SERVER['REQUEST_METHOD'];
-#$method = 'POST';
+#$method = 'GET';
 
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
-#$request = array('boards', 'enemy');
+#$request = array('board', 'enemy', 'a', '1');
 
 $conn = db_connect($info);
 
