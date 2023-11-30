@@ -16,7 +16,7 @@ Battleship board game
 
 ## Current Link (Subject to change): 
 
-[Let's Play](https://users.iee.ihu.gr/adise/DEV/Battleship/index.php)
+[Let's Play](https://users.iee.ihu.gr/~it185149/adise/DEV/Battleship/index.php)
 
 ## API: 
 
