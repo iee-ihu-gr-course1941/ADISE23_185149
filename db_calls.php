@@ -11,6 +11,7 @@ function get_boards($conn, $user) {
 
     $json = substr($my_ships, 0, -2) . ',' . substr($enemy, 1);
     header("Content-Type: application/json");
+    $conn->close();
     echo json_encode(json_decode($json)) . "\n";
 }
 
@@ -28,6 +29,7 @@ function get_board($conn, $user, $board_name) {
     } else {
         $error = ['Error' => 'Invalid Request'];
 		header("Content-Type: application/json");
+		$conn->close();
 		echo json_encode($error) . "\n";
 		exit;
     }
@@ -160,19 +162,24 @@ function get_enemy_cell($conn, $user, $x, $y) {
 
             $response = $json_begin . $json_cell . $json_end;
 	    header("Content-Type: application/json");
-            echo json_encode(json_decode($response)) . "\n";
+	    $conn->close();
+	    echo json_encode(json_decode($response)) . "\n";
             exit;
         } else {
-            $error = ['Error' => 'Cell not found'];
-            header("Content-Type: application/json");
-            echo json_encode($error) . "\n";
-            exit;
+		$error = ['Error' => 'Cell not found'];
+		http_response_code(400);
+	        header("Content-Type: application/json");
+		$conn->close();
+		echo json_encode($error) . "\n";
+                exit;
         }
     } else {
-        $error = ['Error' => 'Invalid Cell Position'];
-        header("Content-Type: application/json");
-        echo json_encode($error) . "\n";
-        exit;
+	    $error = ['Error' => 'Invalid Cell Position'];
+	    http_response_code(400);
+       	    header("Content-Type: application/json");
+	    $conn->close();
+	    echo json_encode($error) . "\n";
+	    exit;
     }
 }
 
