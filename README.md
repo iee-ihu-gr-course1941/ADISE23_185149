@@ -12,6 +12,12 @@ Battleship board game
  - Have fun. (**Mandatory**)
 
 
+
+
+## Current Link (Subject to change): 
+
+[Let's Play](https://users.iee.ihu.gr/adise/DEV/Battleship)
+
 ## API: 
 
 ### Implemented:
