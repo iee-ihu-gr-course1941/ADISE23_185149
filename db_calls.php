@@ -129,7 +129,14 @@ function reset_boards($conn) {
             
             COMMIT;";
             
-    $conn -> multi_query($sql);
+    
+	if ($conn -> multi_query($sql)) {
+		do {
+			if ($result = $conn -> store_result()) {
+				while ($row = $result -> fetch_row()) {}
+		} while ($conn -> next_result());
+	}
+
 }
 
 function get_ships($conn, $user) {
