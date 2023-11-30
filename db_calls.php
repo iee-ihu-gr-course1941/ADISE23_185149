@@ -140,10 +140,6 @@ function reset_boards($conn) {
 
 }
 
-function get_ships($conn, $user) {
-
-}
-
 function get_ship($conn, $user, $ship_name) {
 
 }
@@ -152,12 +148,32 @@ function set_ship($conn, $user, $x1, $y1, $x2, $y2) {
 
 }
 
-function get_enemy($conn, $user) {
-
-}
-
 function get_enemy_cell($conn, $user, $x, $y) {
+    if (in_array($x, [1,2,3,4,5,6] && in_array($y, ['a','b','c','d','e','f']))) {
+        $cell = $conn->query("select $x from player1attack where row = $y");
+        $json_begin = '{"Response":"';
+        $json_end = '}';
+        if ($cell->num_rows = 1) {
+            $row = $cell->fetch_assoc();
 
+            $json_cell = "{\"enemy\":{\"$x\":{\"$y\":\"$row[$y]\"}}}";
+
+            $response = $json_begin . $json_cell . $json_end;
+            header("Content-Type: application/json");
+            echo json_encode(json_decode($response)) . "\n";
+            exit;
+        } else {
+            $error = ['Error' => 'Cell not found'];
+            header("Content-Type: application/json");
+            echo json_encode($error) . "\n";
+            exit;
+        }
+    } else {
+        $error = ['Error' => 'Invalid Cell Position'];
+        header("Content-Type: application/json");
+        echo json_encode($error) . "\n";
+        exit;
+    }
 }
 
 function attack_enemy_cell($conn, $user, $x, $y) {
