@@ -210,7 +210,7 @@ function get_ship($conn, $user, $ship) {
                 }
             } else {
                 $letters = ['a','b','c','d','e','f'];
-                for($x = 0; $x < $letters; $x++) {
+                for($x = 0; $x < sizeof($letters); $x++) {
                     if ($start_letter == $letters[$x]) {
                         $letter_index = $x;
                     }
