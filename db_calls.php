@@ -148,20 +148,27 @@ function reset_boards($conn) {
 
 function get_ship($conn, $user, $ship) {
     if (in_array(strtolower($ship), ['carrier','battleship','submarine','boat'])) {
-        $ship_correct_name = substr(strtoupper($ship), -1 ,0) . substr(strtolower($ship), 1);
-        $cell = $conn->query("select * from player_ships where ship_owner = '$user' and ship_name = '$ship_correct_name'");
-        $json_begin = '{"Response":"';
-        $json_end = '}';
-        if ($cell->num_rows = 1) {
+        $ship_correct_name = substr(strtoupper($ship), 0 ,1) . substr(strtolower($ship), 1);
+	$cell = $conn->query("select * from player_ships where ship_owner = '$user' and ship_name = '$ship_correct_name'");
+        $json_begin = '{"Response":';
+	$json_end = '}';
+        if ($cell->num_rows == 1) {
             $row = $cell->fetch_assoc();
+
+	    if ($row['ship_status'] == 'Not Set') {
+		header('Content-Type: application/json');
+		http_response_code(400);
+		echo json_encode(json_decode('{"Error": "Ship Not Set"}')) . "\n";
+	    	exit;
+	    }
 
             $start = $row['start_position'];
             $start_letter = substr($start, 0, 1);
             $start_number = intval(substr($start, 1));
             $end = $row['end_position'];
             $end_letter = substr($end, 0, 1);
-            $end_number = intval(substr($end, 1));
-            
+	    $end_number = intval(substr($end, 1));
+	    
             if ($start_letter == $end_letter) {
                 //horizontal handling $json_cell
                 switch ($ship_correct_name) {
@@ -173,7 +180,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $start_letter . $start_number+2 . '": "' . $row['third_space'] . '",
                                 "' . $end . '": "' . $row['fourth_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Battleship':
                         $json_cell = '{
                             "Battleship": {
@@ -181,7 +189,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $start_letter . $start_number+1 . '": "' . $row['second_space'] . '",
                                 "' . $end . '": "' . $row['third_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Submarine':
                         $json_cell = '{
                             "Submarine": {
@@ -189,7 +198,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $start_letter . $start_number+1 . '": "' . $row['second_space'] . '",
                                 "' . $end . '": "' . $row['third_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Boat':
                         $json_cell = '{
                             "Boat": {
@@ -202,7 +212,7 @@ function get_ship($conn, $user, $ship) {
                 $letters = ['a','b','c','d','e','f'];
                 for($x = 0; $x < $letters; $x++) {
                     if ($start_letter == $letters[$x]) {
-                        $letter_index = $x
+                        $letter_index = $x;
                     }
                 }
                 //vertical handling $json_cell
@@ -215,7 +225,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $letters[$letter_index+2] . $start_number . '": "' . $row['third_space'] . '",
                                 "' . $end . '": "' . $row['fourth_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Battleship':
                         $json_cell = '{
                             "Battleship": {
@@ -223,7 +234,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $letters[$letter_index+1] . $start_number . '": "' . $row['second_space'] . '",
                                 "' . $end . '": "' . $row['third_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Submarine':
                         $json_cell = '{
                             "Submarine": {
@@ -231,7 +243,8 @@ function get_ship($conn, $user, $ship) {
                                 "' . $letters[$letter_index+1] . $start_number . '": "' . $row['second_space'] . '",
                                 "' . $end . '": "' . $row['third_space'] . '"
                             }
-                        }';
+			}';
+			break;
                     case 'Boat':
                         $json_cell = '{
                             "Boat": {
@@ -243,7 +256,7 @@ function get_ship($conn, $user, $ship) {
             }
 
             $response = $json_begin . $json_cell . $json_end;
-            header("Content-Type: application/json");
+	    header("Content-Type: application/json");
             echo json_encode(json_decode($response)) . "\n";
             exit;
         } else {

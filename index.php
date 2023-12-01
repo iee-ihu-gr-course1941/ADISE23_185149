@@ -13,7 +13,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 #$method = 'GET';
 
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
-#$request = array('board', 'enemy', 'a', '1');
+#$request = array('board', 'my_ships', 'Carrier');
 
 $conn = db_connect($info);
 
