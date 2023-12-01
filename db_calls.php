@@ -146,8 +146,118 @@ function reset_boards($conn) {
 
 }
 
-function get_ship($conn, $user, $ship_name) {
+function get_ship($conn, $user, $ship) {
+    if (in_array(strtolower($ship), ['carrier','battleship','submarine','boat'])) {
+        $ship_correct_name = substr(strtoupper($ship), -1 ,0) . substr(strtolower($ship), 1);
+        $cell = $conn->query("select * from player_ships where ship_owner = '$user' and ship_name = '$ship_correct_name'");
+        $json_begin = '{"Response":"';
+        $json_end = '}';
+        if ($cell->num_rows = 1) {
+            $row = $cell->fetch_assoc();
 
+            $start = $row['start_position'];
+            $start_letter = substr($start, 0, 1);
+            $start_number = intval(substr($start, 1));
+            $end = $row['end_position'];
+            $end_letter = substr($end, 0, 1);
+            $end_number = intval(substr($end, 1));
+            
+            if ($start_letter == $end_letter) {
+                //horizontal handling $json_cell
+                switch ($ship_correct_name) {
+                    case 'Carrier':
+                        $json_cell = '{
+                            "Carrier": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $start_letter . $start_number+1 . '": "' . $row['second_space'] . '",
+                                "' . $start_letter . $start_number+2 . '": "' . $row['third_space'] . '",
+                                "' . $end . '": "' . $row['fourth_space'] . '"
+                            }
+                        }';
+                    case 'Battleship':
+                        $json_cell = '{
+                            "Battleship": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $start_letter . $start_number+1 . '": "' . $row['second_space'] . '",
+                                "' . $end . '": "' . $row['third_space'] . '"
+                            }
+                        }';
+                    case 'Submarine':
+                        $json_cell = '{
+                            "Submarine": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $start_letter . $start_number+1 . '": "' . $row['second_space'] . '",
+                                "' . $end . '": "' . $row['third_space'] . '"
+                            }
+                        }';
+                    case 'Boat':
+                        $json_cell = '{
+                            "Boat": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $end . '": "' . $row['second_space'] . '"
+                            }
+                        }';
+                }
+            } else {
+                $letters = ['a','b','c','d','e','f'];
+                for($x = 0; $x < $letters; $x++) {
+                    if ($start_letter == $letters[$x]) {
+                        $letter_index = $x
+                    }
+                }
+                //vertical handling $json_cell
+                switch ($ship_correct_name) {
+                    case 'Carrier':
+                        $json_cell = '{
+                            "Carrier": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $letters[$letter_index+1] . $start_number . '": "' . $row['second_space'] . '",
+                                "' . $letters[$letter_index+2] . $start_number . '": "' . $row['third_space'] . '",
+                                "' . $end . '": "' . $row['fourth_space'] . '"
+                            }
+                        }';
+                    case 'Battleship':
+                        $json_cell = '{
+                            "Battleship": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $letters[$letter_index+1] . $start_number . '": "' . $row['second_space'] . '",
+                                "' . $end . '": "' . $row['third_space'] . '"
+                            }
+                        }';
+                    case 'Submarine':
+                        $json_cell = '{
+                            "Submarine": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $letters[$letter_index+1] . $start_number . '": "' . $row['second_space'] . '",
+                                "' . $end . '": "' . $row['third_space'] . '"
+                            }
+                        }';
+                    case 'Boat':
+                        $json_cell = '{
+                            "Boat": {
+                                "' . $start . '": "' . $row['first_space'] . '",
+                                "' . $end . '": "' . $row['second_space'] . '"
+                            }
+                        }';
+                }
+            }
+
+            $response = $json_begin . $json_cell . $json_end;
+            header("Content-Type: application/json");
+            echo json_encode(json_decode($response)) . "\n";
+            exit;
+        } else {
+            $error = ['Error' => 'Ship not found'];
+            header("Content-Type: application/json");
+            echo json_encode($error) . "\n";
+            exit;
+        }
+    } else {
+        $error = ['Error' => 'Invalid Ship name'];
+        header("Content-Type: application/json");
+        echo json_encode($error) . "\n";
+        exit;
+    }
 }
 
 function set_ship($conn, $user, $x1, $y1, $x2, $y2) {
