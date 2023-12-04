@@ -9,7 +9,7 @@ function get_boards($conn, $user) {
     $my_ships = get_board($conn, $user, 'my_ships');
     $enemy = get_board($conn, $user, 'enemy');
 
-    $json = substr($my_ships, 0, -2) . ',' . substr($enemy, 1);
+    $json = '{"Response":' . substr($my_ships, 0, -2) . ',' . substr($enemy, 1) . '}';
     header("Content-Type: application/json");
     $conn->close();
     echo json_encode(json_decode($json)) . "\n";

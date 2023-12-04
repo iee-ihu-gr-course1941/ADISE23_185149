@@ -32,7 +32,7 @@ case 'board':
 			if (sizeof($request) == 2) {
 				$board = get_board($conn, $user, 'my_ships');
 				header("Content-Type: application/json");
-				echo $board . "\n";
+				echo '{"Response":' . $board . '}' . "\n";
 			} else {
 				get_ship($conn, $user, $request[2]);
 			}
@@ -44,7 +44,7 @@ case 'board':
 			if (sizeof($request) == 2) {
 				$board = get_board($conn, $user, 'enemy');
 				header("Content-Type: application/json");
-				echo $board . "\n";
+				echo '{"Response":' . $board . '}' . "\n";
 			} else {
 				get_enemy_cell($conn, $user, $request[2], $request[3]);
 			}
