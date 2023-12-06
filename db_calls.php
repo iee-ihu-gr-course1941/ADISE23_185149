@@ -294,6 +294,20 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 		echo json_encode($error) . "\n";
 		exit;
 	}
+	if ($x1 == $x2) {
+		$orientation = 'horizontal';
+	} else {
+		$orientation = 'vertical';
+	}
+	if (!can_place_ship($conn, $user, $x1, $y1, $orientation, $ship)) {
+		$error = ['Error' => 'Ship can not be placed there'];
+		header('Content-Type: application/json');
+		$conn->close();
+		http_response_code(400);
+		echo json_encode($error);
+		exit;
+	}
+
 	$result = $conn->query("select * from player_ships where ship_name = '$ship' and ship_owner = '$user';");
 	$conn->store_result();
 
@@ -611,10 +625,11 @@ function get_player_usernames() {
 }
 
 function can_place_ship($conn, $user, $startNumber, $startLetter, $orientation, $ship) {
-	$result = $conn->query("select * from player1ships;");
+	$sql = "select * from player1ships;";
 	if ($user == 'Player2') {
-		$result = $conn->query("select * from player2ships;");
+		$sql = "select * from player2ships;";
 	}
+	$result = $conn->query($sql);
 	if ($result->num_rows > 0) {
 		$count = 0;
 		while ($row = $result->fetch_assoc()) {
@@ -707,32 +722,43 @@ function can_place_ship($conn, $user, $startNumber, $startLetter, $orientation, 
 					return false;
 				}
 			} else {
-				$col = $row[$startLetter];
-				if ($col == 'U') {
-					$count = $count + 1;
-
-				} else {
-					return false;
+				if ((int)$row['row'] >= (int)$startNumber) {
+					$col = 123;
+					switch ($startLetter) {
+					case 'a': $col = $row['a']; break;
+					case 'b': $col = $row['b']; break;
+					case 'c': $col = $row['c']; break;
+					case 'd': $col = $row['d']; break;
+					case 'e': $col = $row['e']; break;
+					case 'f': $col = $row['f']; break;
+					}	
+					if ($col == 'U') {
+						$count = $count + 1;
+	
+					} else {
+						return false;
+					}
+	
+					switch ($ship) {
+					case 'Carrier':
+						if ($count == 4) {
+							return true;
+						}
+						break;
+					case 'Battleship':
+					case 'Submarine':
+						if ($count == 3) {
+							return true;
+						}
+						break;
+					case 'Boat':
+						if ($count == 2) {
+							return true;
+						}
+						break;
+					}
 				}
 
-				switch ($ship) {
-				case 'Carrier':
-					if ($count == 4) {
-						return true;
-					}
-					break;
-				case 'Battleship':
-				case 'Submarine':
-					if ($count == 3) {
-						return true;
-					}
-					break;
-				case 'Boat':
-					if ($count == 2) {
-						return true;
-					}
-					break;
-				}
 			}
 		}
 	}
