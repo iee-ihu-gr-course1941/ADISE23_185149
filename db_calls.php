@@ -273,11 +273,249 @@ function get_ship($conn, $user, $ship) {
     }
 }
 
-function set_ship($conn, $user, $x1, $y1, $x2, $y2) {
+function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
+	$x1 = strtolower($x1);
+	$x2 = strtolower($x2);
+	$ship = strtoupper(substr($ship, 0, 1)) . strtolower(substr($ship, 1));
+	$yarray = ['a','b','c','d','e','f'];
+	$xarray = ['1','2','3','4','5','6'];
+	if (!in_array($y1, $yarray) || !in_array($y2, $yarray) || !in_array($x1, $xarray) || !in_array($x2, $xarray)) {
+		$error = ['Error' => 'Ship Coordinates out of range'];
+		header('Content-Type: application/json');
+		http_response_code(400);
+		$conn->close();
+		echo json_encode($error) . "\n";
+		exit;
+	} else if ($x1 != $x2 && $y1 != $y2) {
+		$error = ['Error' => 'Ship Position is invalid'];
+		header('Content-Type: application/json');
+		http_response_code(400);
+		$conn->close();
+		echo json_encode($error) . "\n";
+		exit;
+	}
+	$result = $conn->query("select * from player_ships where ship_name = '$ship' and ship_owner = '$user';");
+	$conn->store_result();
 
+	$row = $result->fetch_assoc();
+	if ($row['ship_status'] != 'Not Set') {
+		$error = ['Error' => 'Ship already set'];
+		header('Content-Type: application/json');
+		http_response_code(400);
+		$conn->close();
+		echo json_encode($error) . "\n";
+		exit;	
+	}
+	$playerboard = 'player1ships';
+	if ($user == 'Player2') {
+		$playerboard = 'player2ships';
+	}
+
+	if ($y1 == $y2) {
+		switch ($ship) {
+		case 'Carrier': 
+			if (($x2 == $x1 + 3) && $x2 <= 6) {
+				
+				$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'C' where row = '$x1' or row = '" . $x1+1 . "' or row = '" . $x1+2 . "' or row = '$x2';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK', fourth_space = 'OK' where ship_name = 'Carrier' and ship_owner = '$user';
+
+				COMMIT;
+				";
+
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			break;
+		case 'Battleship':
+			if (($x2 == $x1 + 2) && $x2 <= 6) {
+				
+				$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'B' where row = '$x1' or row = '" . $x1+1 . "' or row = '$x2';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Battleship' and ship_owner = '$user';
+
+				COMMIT;
+				";
+
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			break;
+		case 'Submarine':
+			if (($x2 == $x1 + 2) && $x2 <= 6) {
+				
+				$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'S' where row = '$x1' or row = '" . $x1+1 . "' or row = '$x2';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Submarine' and ship_owner = '$user';
+
+				COMMIT;
+				";
+
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			break;
+		case 'Boat':
+			if ($x2 <= 5 && $x1+1 == $x2) {
+				
+				$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'b' where row = '$x1' or row = '$x2';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+
+				COMMIT;
+				";
+
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			break;
+		}
+	} else {
+		switch ($ship) {
+		case 'Carrier':
+			if ($y1 == 'a' && $y2 == 'd') {
+				$ybetween1 = 'b';
+				$ybetween2 = 'c';
+			} else if ($y1 == 'b' && $y2 == 'e') {
+				$ybetween1 = 'c';
+				$ybetween2 = 'd';
+			} else if ($y1 == 'c' && $y2 == 'f') {
+				$ybetween1 = 'd';
+				$ybetween2 = 'e';
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+				
+			$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'C', $ybetween1 = 'C', $ybetween2 = 'C', $y2 = 'C' where row = '$x1';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK', fourth_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+
+				COMMIT;
+			";
+			break;
+
+		case 'Battleship':
+			if ($y1 == 'a' && $y2 == 'c') {
+				$ybetween1 = 'b';
+			} else if ($y1 == 'b' && $y2 == 'd') {
+				$ybetween1 = 'c';
+			} else if ($y1 == 'c' && $y2 == 'e') {
+				$ybetween1 = 'd';
+			} else if ($y1 == 'd' && $y2 == 'f'){
+				$ybetween1 = 'e';
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'B', $ybetween1 = 'B', $y2 = 'B' where row = '$x1';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+
+				COMMIT;
+			";
+			break;
+
+		case 'Submarine':
+			if ($y1 == 'a' && $y2 == 'c') {
+				$ybetween1 = 'b';
+			} else if ($y1 == 'b' && $y2 == 'd') {
+				$ybetween1 = 'c';
+			} else if ($y1 == 'c' && $y2 == 'e') {
+				$ybetween1 = 'd';
+			} else if ($y1 == 'd' && $y2 == 'f'){
+				$ybetween1 = 'e';
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'S', $ybetween1 = 'S', $y2 = 'S' where row = '$x1';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+
+				COMMIT;
+			";
+			break;
+
+		case 'Boat':
+			if ( ($y1 == 'a' && $y2 == 'b') || ($y1 == 'b' && $y2 == 'c') || ($y1 == 'c' && $y2 == 'd') || ($y1 == 'd' && $y2 == 'e') || ($y1 == 'e' && $y2 == 'f') ) {
+				
+				$sql = "
+				START TRANSACTION;
+
+				UPDATE $playerboard SET $y1 = 'b', $y2 = 'b' where row = '$x1';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+
+				COMMIT;
+				";
+
+			} else {
+				$error = ['Error' => 'Ship Position is invalid'];
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$conn->close();
+				echo json_encode($error);
+				exit;
+			}
+			break;
+
+		}
+	}
+
+	$conn->multi_query($sql);
+	do { $conn->store_result(); }
+	while ($conn->next_result());
+	get_ship($conn, $user, $ship);
 }
 
 function get_enemy_cell($conn, $user, $x, $y) {
+    $x = strtolower($x);
     if (in_array($y, ['1','2','3','4','5','6']) && in_array($x, ['a','b','c','d','e','f'])) {
         $cell = $conn->query("select $x from player1attack where row = $y");
         $json_begin = '{"Response":';
@@ -311,7 +549,30 @@ function get_enemy_cell($conn, $user, $x, $y) {
 }
 
 function attack_enemy_cell($conn, $user, $x, $y) {
+	$result = $conn->query('select * from status');
+	if ($result->num_rows > 0) {
+		while ($row = $result->fetch_assoc()) {
+			if ($row['gamestate'] != 'Battle') {
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$error = ['Error' => 'Game not in Battle Mode'];
+				echo json_encode($error);
+				exit;
+			} else if ($row['next_action'] != $user) {
+				header('Content-Type: application/json');
+				http_response_code(400);
+				$error = ['Error' => 'Not your turn'];
+				echo json_encode($error);
+				exit;
+			}
+		}
+	}
 
+	#Attack here
+	#Edit the ships table if damaged or sunk ship
+	#Edit the playerXtable with the shot
+	
+	get_board($conn, $user, 'enemy');
 }
 
 function get_status($conn) {

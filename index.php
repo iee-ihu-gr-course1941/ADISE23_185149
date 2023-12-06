@@ -10,10 +10,10 @@ $user = authenticate(get_player_usernames());
 #$user = 'Player1';
 
 $method = $_SERVER['REQUEST_METHOD'];
-#$method = 'GET';
+#$method = 'POST';
 
 $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
-#$request = array('board', 'my_ships', 'Carrier');
+#$request = array('board', 'my_ships', 'Carrier', '1', 'a', '4', 'a');
 
 $conn = db_connect($info);
 
@@ -37,7 +37,7 @@ case 'board':
 				get_ship($conn, $user, $request[2]);
 			}
 		} else if ($method == 'POST') {
-			set_ship($conn, $user, $request[2], $request[3], $request[4], $request[5]);
+			set_ship($conn, $user, $request[2], $request[3], $request[4], $request[5], $request[6]);
 		}
 	} else if ($request[1] == 'enemy') {
 		if ($method == 'GET') {
@@ -48,8 +48,8 @@ case 'board':
 			} else {
 				get_enemy_cell($conn, $user, $request[2], $request[3]);
 			}
-		} else if ($request == 'POST') {
-			attack_cell($conn, $user, $request[2], $request[3]);
+		} else if ($method == 'POST') {
+			attack_enemy_cell($conn, $user, $request[2], $request[3]);
 		}
 	}
 	break;
