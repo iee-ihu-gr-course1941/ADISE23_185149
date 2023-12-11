@@ -68,7 +68,11 @@ x values:
 
 ### SECRETS.php file
 
-- $username = 'yourusername';
-- $password = 'yourpassword';
-- $serevrname = 'yourserverURL';
-- $dbname = 'yourschemaname';
+```
+<?php
+$username = 'yourusername';
+$password = 'yourpassword';
+$serevrname = 'yourserverURL';
+$dbname = 'yourschemaname';
+?>
+```
