@@ -584,15 +584,21 @@ function attack_enemy_cell($conn, $user, $x, $y) {
 			}
 		}
 	}
+	
+	if ($y > 6 || !in_array($x , ['a','b','c','d','e','f'])) {
+		header('Content-Type: application/json');
+		http_response_code(400);
+		$error = ['Error' => 'Coordinates out of range'];
+		echo json_encode($error);
+		exit;
+	}
 
 	$conn->store_result();
-	
+
 	if ($user == 'Player1') {
-		$sql3 = "update status set next_action = 'Player2';";
 		$playerboard = 'player1attack';
 		$sql = "select $x from player2ships where row = '$y';";
 	} else {
-		$sql3 = "update status set next_action = 'Player1';";
 		$playerboard = 'player2attack';
 		$sql = "select $x from player1ships where row = '$y';";
 	}
@@ -650,8 +656,6 @@ function attack_enemy_cell($conn, $user, $x, $y) {
 						}
 					}
 				}
-				$conn->query($sql3);
-				$conn->store_result();
 				$sql2 = "update $playerboard set $x = 'H' where row = '$y';";
 				$conn->multi_query("START TRANSACTION; $sql1 $sql2 CALL ship_status_from_battle(); COMMIT;");
 				do {
