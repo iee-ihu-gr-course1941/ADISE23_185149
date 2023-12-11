@@ -299,14 +299,6 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 	} else {
 		$orientation = 'vertical';
 	}
-	if (!can_place_ship($conn, $user, $x1, $y1, $orientation, $ship)) {
-		$error = ['Error' => 'Ship can not be placed there'];
-		header('Content-Type: application/json');
-		$conn->close();
-		http_response_code(400);
-		echo json_encode($error);
-		exit;
-	}
 
 	$result = $conn->query("select * from player_ships where ship_name = '$ship' and ship_owner = '$user';");
 	$conn->store_result();
@@ -320,6 +312,17 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 		echo json_encode($error) . "\n";
 		exit;	
 	}
+
+	if (!can_place_ship($conn, $user, $x1, $y1, $orientation, $ship)) {
+		$error = ['Error' => 'Ship can not be placed there'];
+		header('Content-Type: application/json');
+		$conn->close();
+		http_response_code(400);
+		echo json_encode($error);
+		exit;
+	}
+	$conn->store_result();
+
 	$playerboard = 'player1ships';
 	if ($user == 'Player2') {
 		$playerboard = 'player2ships';
@@ -437,7 +440,7 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 				START TRANSACTION;
 
 				UPDATE $playerboard SET $y1 = 'C', $ybetween1 = 'C', $ybetween2 = 'C', $y2 = 'C' where row = '$x1';
-				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK', fourth_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK', fourth_space = 'OK' where ship_name = 'Carrier' and ship_owner = '$user';
 
 				COMMIT;
 			";
@@ -464,7 +467,7 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 				START TRANSACTION;
 
 				UPDATE $playerboard SET $y1 = 'B', $ybetween1 = 'B', $y2 = 'B' where row = '$x1';
-				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Battleship' and ship_owner = '$user';
 
 				COMMIT;
 			";
@@ -491,7 +494,7 @@ function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
 				START TRANSACTION;
 
 				UPDATE $playerboard SET $y1 = 'S', $ybetween1 = 'S', $y2 = 'S' where row = '$x1';
-				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Boat' and ship_owner = '$user';
+				UPDATE player_ships set ship_status = 'Undamaged', start_position = '$y1$x1', end_position = '$y2$x2', first_space = 'OK', second_space = 'OK', third_space = 'OK' where ship_name = 'Submarine' and ship_owner = '$user';
 
 				COMMIT;
 			";
@@ -582,11 +585,89 @@ function attack_enemy_cell($conn, $user, $x, $y) {
 		}
 	}
 
-	#Attack here
-	#Edit the ships table if damaged or sunk ship
-	#Edit the playerXtable with the shot
+	$conn->store_result();
 	
-	get_board($conn, $user, 'enemy');
+	if ($user == 'Player1') {
+		$sql3 = "update status set next_action = 'Player2';";
+		$playerboard = 'player1attack';
+		$sql = "select $x from player2ships where row = '$y';";
+	} else {
+		$sql3 = "update status set next_action = 'Player1';";
+		$playerboard = 'player2attack';
+		$sql = "select $x from player1ships where row = '$y';";
+	}
+
+	$result = $conn->query($sql);
+	if ($result->num_rows > 0) {
+		while ($row = $result->fetch_assoc()) {
+			$col = 123;
+			switch ($x) {
+			case 'a': $col = $row['a']; break;
+			case 'b': $col = $row['b']; break;
+			case 'c': $col = $row['c']; break;
+			case 'd': $col = $row['d']; break;
+			case 'e': $col = $row['e']; break;
+			case 'f': $col = $row['f']; break;
+			}	
+			$ship_attack = 123;
+			switch ($col) {
+			case 'U': $ship_attack = 'Miss'; break;
+			case 'C': $ship_attack = 'Carrier'; break;
+			case 'B': $ship_attack = 'Battleship'; break;
+			case 'S': $ship_attack = 'Submarine'; break;
+			case 'b': $ship_attack = 'Boat'; break;
+			}
+			if ($ship_attack == 'Miss') {
+				$conn->query("update $playerboard set $x = 'M' where row = '$y'");
+				$conn->store_result();
+			} else {
+				$result = $conn->query("select start_position, end_position from player_ships where ship_name = '$ship_attack' and ship_owner <> '$user';");
+			
+				while ($row = $result->fetch_assoc()) {
+					$x1 = substr($row['start_position'], 0, 1);
+					$x2 = substr($row['end_position'], 0, 1);
+					$y1 = (int)substr($row['start_position'], 1);
+					$y2 = (int)substr($row['end_position'], 1);
+					$arrX = ['a','b','c','d','e','f'];
+					$x1index = array_search($x1,$arrX);
+					$xindex = array_search($x, $arrX);
+
+					$sql1 = "";
+					if ($x1 == $x2) {
+						switch ((int)$y) {
+						case $y1: $sql1 = "update player_ships set first_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $y1+1: $sql1 = "update player_ships set second_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $y1+2: $sql1 = "update player_ships set third_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $y1+3: $sql1 = "update player_ships set fourth_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						}
+					}
+					else {
+						switch ($xindex) {
+						case $x1index: $sql1 = "update player_ships set first_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $x1index+1: $sql1 = "update player_ships set second_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $x1index+2: $sql1 = "update player_ships set third_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						case $x1index+3: $sql1 = "update player_ships set fourth_space = 'Damaged' where ship_name = '$ship_attack' and ship_owner <> '$user';"; break;
+						}
+					}
+				}
+				$conn->query($sql3);
+				$conn->store_result();
+				$sql2 = "update $playerboard set $x = 'H' where row = '$y';";
+				$conn->multi_query("START TRANSACTION; $sql1 $sql2 CALL ship_status_from_battle(); COMMIT;");
+				do {
+					$conn->store_result();
+				} while ($conn->next_result());
+			}
+		}
+	}
+
+
+	$enemy = get_board($conn, $user, 'enemy');
+
+	$json = '{ "Response":' . $enemy .  '}';
+	header('Content-Type: application/json');
+	http_response_code(200);
+	echo $json;
 }
 
 function get_status($conn) {
