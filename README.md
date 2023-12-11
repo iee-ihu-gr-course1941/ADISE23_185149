@@ -2,6 +2,7 @@
 
 Battleship board game
 
+
 ## How to play:
 
  - Set up your ships vertically or horizontally.
@@ -17,10 +18,9 @@ Battleship board game
 ## Current Link (Subject to change): 
 
 [Let's Play](https://users.iee.ihu.gr/~it185149/adise/DEV/Battleship/index.php)
+You can play as either Player1 or Player2 (Basic Auth with no password check)
 
 ## API: 
-
-### Implemented:
 
 - ```/boards/``` GET 	- Returns your boards
 - ```/boards/``` POST 	- Initializes boards and returns player boards
