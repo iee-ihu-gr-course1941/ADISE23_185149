@@ -273,7 +273,7 @@ function get_ship($conn, $user, $ship) {
     }
 }
 
-function set_ship($conn, $user, $ship, $x1, $y1, $x2, $y2) {
+function set_ship($conn, $user, $ship, $y1, $x1, $y2, $x2) {
 	$x1 = strtolower($x1);
 	$x2 = strtolower($x2);
 	$ship = strtoupper(substr($ship, 0, 1)) . strtolower(substr($ship, 1));
@@ -658,9 +658,8 @@ function attack_enemy_cell($conn, $user, $x, $y) {
 				}
 				$sql2 = "update $playerboard set $x = 'H' where row = '$y';";
 				$conn->multi_query("START TRANSACTION; $sql1 $sql2 CALL ship_status_from_battle(); COMMIT;");
-				do {
-					$conn->store_result();
-				} while ($conn->next_result());
+				do { $conn->store_result(); } 
+				while ($conn->next_result());
 			}
 		}
 	}
