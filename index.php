@@ -17,6 +17,18 @@ $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
 
 $conn = db_connect($info);
 
+if ($result = $conn->query("select next_action from status")) {
+	while ($row = $result->fetch_assoc()) {
+		if ( !($row['next_action'] == $user || $row['next_action'] == 'Both') ) {
+			header('Content-Type: application/json');
+			http_response_code(400);
+			$error = ['Error' => 'Not your turn'];
+			echo json_encode($error);
+			exit;
+		}
+	}
+}
+
 switch ($r = $request[0]) {
 case 'boards':
 	if ($method == 'GET') {
