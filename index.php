@@ -19,7 +19,13 @@ $conn = db_connect($info);
 
 if ($result = $conn->query("select next_action from status")) {
 	while ($row = $result->fetch_assoc()) {
-		if ( !($row['next_action'] == $user || $row['next_action'] == 'Both') ) {
+		if ($row['next_action'] == 'None') {
+			header('Content-Type: application/json');
+			http_response_code(400);
+			$error = ['Game Over' => $row['gamestate']];
+			echo json_encode($error);
+			exit;
+		} else if ( !($row['next_action'] == $user || $row['next_action'] == 'Both') ) {
 			header('Content-Type: application/json');
 			http_response_code(400);
 			$error = ['Error' => 'Not your turn'];
